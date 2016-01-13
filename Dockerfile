@@ -16,15 +16,21 @@ RUN apt-get install -y wget && \
 
 # install RPI.GPIO python libs
 RUN apt-get install -y wget && \
-     wget http://downloads.sourceforge.net/project/raspberry-gpio-python/raspbian-wheezy/python-rpi.gpio_0.5.11-1_armhf.deb && \
-     dpkg -i python-rpi.gpio_0.5.11-1_armhf.deb && \
-     rm python-rpi.gpio_0.5.11-1_armhf.deb && \
+     wget http://downloads.sourceforge.net/project/raspberry-gpio-python/raspbian-jessie/python-rpi.gpio_0.6.1-1~jessie_armhf.deb && \
+     dpkg -i python-rpi.gpio_0.6.1-1~jessie_armhf.deb && \
+     rm python-rpi.gpio_0.6.1-1~jessie_armhf.deb && \
      apt-get autoremove -y wget
 
-# install node-red
-RUN apt-get install -y build-essential && \
+# copy a wiringpi installer in order to use the official repo: git://git.drogon.net/wiringPi
+COPY ./install /root
+RUN chmod 777 /root/install-wiringpi.sh
+
+# install node-red wiringPi and raspi-io
+RUN apt-get install -y build-essential git && \
     npm install -g --unsafe-perm  node-red && \
-    apt-get autoremove -y build-essential
+    /root/install-wiringpi.sh && \
+    npm install raspi-io && \
+    apt-get autoremove -y build-essential  git
 
 # install nodered nodes
 RUN touch /usr/share/doc/python-rpi.gpio
@@ -39,7 +45,8 @@ env PATH ~/bin:$PATH
 WORKDIR /root/.node-red
 RUN npm install node-red-node-redis && \
     npm install node-red-contrib-googlechart && \
-    npm install node-red-node-web-nodes 
+    npm install node-red-node-web-nodes && \
+    npm install node-red-contrib-gpio
 
 # run application
 EXPOSE 1880
