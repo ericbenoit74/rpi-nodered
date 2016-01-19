@@ -1,7 +1,3 @@
-# Usage : 
-# create the folder /root/nodereddir (for example)
-# docker run -p 1880:1880 --privileged -d --name nodered -v '/root/nodereddir:/root/.node-red' nieleyde/rpi-nodered
-
 # DOCKER-VERSION 1.0.0
 FROM resin/rpi-raspbian
 
@@ -25,11 +21,10 @@ RUN apt-get install -y wget && \
      rm python-rpi.gpio_0.6.1-1~jessie_armhf.deb && \
      apt-get autoremove -y wget
 
-# copy a wiringpi installer in order to use the official repo: git://git.drogon.net/wiringPi
 COPY ./install /root
 RUN chmod 777 /root/install-wiringpi.sh
 
-# install node-red wiringPi and raspi-io
+# install node-red
 RUN apt-get install -y build-essential git && \
     npm install -g --unsafe-perm  node-red && \
     /root/install-wiringpi.sh && \
@@ -46,7 +41,7 @@ RUN ln -s /usr/bin/python2 ~/bin/python
 RUN ln -s /usr/bin/python2-config ~/bin/python-config
 env PATH ~/bin:$PATH
 
-WORKDIR /root/.node-red
+WORKDIR /usr/local/lib/node_modules/node-red
 RUN npm install node-red-node-redis && \
     npm install node-red-contrib-googlechart && \
     npm install node-red-node-web-nodes && \
@@ -55,4 +50,5 @@ RUN npm install node-red-node-redis && \
 # run application
 EXPOSE 1880
 #CMD ["/bin/bash"]
-ENTRYPOINT ["node-red-pi","-v","--max-old-space-size=128" "flows.json"]
+ENTRYPOINT ["node-red-pi","-v","--max-old-space-size=128","--settings","/root/settings.js"]
+
