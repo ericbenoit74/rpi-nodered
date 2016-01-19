@@ -1,3 +1,7 @@
+# Usage : 
+# create the folder /root/nodereddir (for example)
+# docker run -p 1880:1880 --privileged -d --name nodered -v '/root/nodereddir:/root/.node-red' nieleyde/rpi-nodered
+
 # DOCKER-VERSION 1.0.0
 FROM resin/rpi-raspbian
 
@@ -51,4 +55,4 @@ RUN npm install node-red-node-redis && \
 # run application
 EXPOSE 1880
 #CMD ["/bin/bash"]
-ENTRYPOINT ["node-red-pi","-v","--max-old-space-size=128"]
+ENTRYPOINT ["node-red-pi","-v","--max-old-space-size=128" "flows.json"]
